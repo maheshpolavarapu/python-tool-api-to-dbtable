@@ -2,41 +2,27 @@ import json
 import requests
 import pprint
 import mysql.connector
+import pandas as pd 
+link = "https://gorest.co.in/public/v1/users"
 
+# 1. Call API
+response = requests.get(link)
+result = json.loads(response.text)
 
-print('hello world')
-
-# load API result into a variable
-    # https://gorest.co.in/public/v1/users  -> Sample API
-
-
-# r = requests.get("https://gorest.co.in/public/v1/users") 
-
-# # print(r.json())
-# pprint.pprint(r.json())
-
-
-# Parse JSON API result 
-
-# SQL_COMMAND = "INSERT INTO Person(PersonID,LastName,FirstName,Address,City) VALUES (2,'p','mahesh','karavadi','ongole')"
-SQL_COMMAND = "select * from Person"
-# Connect to database
-
-
-
-# Run INSERT SQL into a table and insert API RESULT
 mydb = mysql.connector.connect(
   host="127.0.0.1",
   user="python",
   password="python",
   database="python"
 )
-
 mycursor = mydb.cursor()
 
-mycursor.execute(SQL_COMMAND)
-# mydb.commit()
-myresult = mycursor.fetchall()
 
-for x in myresult:
-  print(x)
+# 2. Get rows from response
+for i in range(0, 20):
+    row = result['data'][i]
+    SQL_COMMAND = "INSERT INTO `users`(`id`,`name`,`email`,`gender`,`status`)VALUES("+str(row['id'])+",'"+row['name']+"','"+row['email']+"','"+row['gender']+"','"+row['status']+"')"
+    mycursor.execute(SQL_COMMAND)
+    mydb.commit()
+
+print("Completed ")
